@@ -1,3 +1,4 @@
 pydub
 pytube
 streamlit
+ffmpeg
