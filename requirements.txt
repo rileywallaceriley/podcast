@@ -1,3 +1,3 @@
-pydub==0.25.1
-pytube==11.0.0
-streamlit==1.8.0
+pydub
+pytube
+streamlit
