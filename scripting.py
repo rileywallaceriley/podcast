@@ -55,18 +55,26 @@ def find_songs(youtube_api_key, query):
     return songs
 
 def main():
+    st.title("Podcast Script Generator")
+    
     intro = create_dynamic_intro()
     news_query = "latest technology news"
+    # Assuming you have a function like this to fetch news URLs
     news_urls = search_for_news(GOOGLE_API_KEY, news_query)
+    # Assuming you have a function to summarize these URLs
     news_summaries = summarize_news(news_urls)
     news_segment = "Here are today's top tech stories: " + " ".join(news_summaries)
     
     songs_query = "top tech innovation songs"
+    # Assuming you have a function like this to find songs
     songs = find_songs(YOUTUBE_API_KEY, songs_query)
     mixtape_segment = "And now, let's get your mood right with our daily mixtape: " + " ".join(songs)
     
     full_script = f"{intro}\n\n{news_segment}\n\n{mixtape_segment}"
-    print(full_script)
+    
+    # Use Streamlit functions to display the script
+    st.subheader("Generated Podcast Script")
+    st.text(full_script)  # This displays the full script as plain text. Use st.markdown for markdown.
 
 if __name__ == "__main__":
     main()
