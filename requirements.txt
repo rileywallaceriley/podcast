@@ -7,3 +7,4 @@ google-auth-httplib2==0.1.0
 openai==0.10.2
 requests==2.27.1
 googlesearch-python
+google-api-python-client
