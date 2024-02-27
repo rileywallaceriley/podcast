@@ -1,36 +1,42 @@
 import datetime
 import openai
+import requests
 
-# Configurations
-GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY'
-YOUTUBE_API_KEY = 'YOUR_YOUTUBE_API_KEY'
+# Replace these with your actual API keys
 OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'
+GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY'
+YOUTUBE_API_SERVICE_NAME = 'youtube'
+YOUTUBE_API_VERSION = 'v3'
+YOUTUBE_API_KEY = 'YOUR_YOUTUBE_API_KEY'
 
 openai.api_key = OPENAI_API_KEY
 
 def get_current_date():
-    return datetime.datetime.now().strftime("%B %d, %Y")
+    """Returns the current date in a readable format."""
+    return datetime.datetime.now().strftime("%Y-%m-%d")
 
 def create_dynamic_intro():
-    intro = f"Good morning, tech enthusiasts! It's {get_current_date()}, and you're listening to the RepuRocket Daily with your host, Sullivan Walker. Let's explore the cutting-edge of technology and innovation, with a sprinkle of good vibes and humor. Get ready for a ride into the future!"
+    """Generates a dynamic introduction for the podcast."""
+    intro = f"Good morning, tech enthusiasts! It's {get_current_date()}, and you're listening to the RepuRocket Daily with your host. Let's dive into the cutting-edge of technology and innovation, sprinkled with good vibes and humor. Get ready for a ride into the future!"
     return intro
 
-def search_for_news():
-    # Placeholder: Replace this with actual logic to fetch news URLs
-    # For example, using the Google Custom Search JSON API
-    news_urls = [
-        'https://example.com/news/story1',
-        'https://example.com/news/story2',
-        'https://example.com/news/story3'
-    ]
+def search_for_news(api_key, query):
+    """Searches for news articles using the Google Custom Search JSON API."""
+    search_engine_id = 'YOUR_SEARCH_ENGINE_ID'
+    url = f"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={search_engine_id}&q={query}"
+    response = requests.get(url)
+    results = response.json().get('items', [])
+    news_urls = [result['link'] for result in results[:3]]  # Limiting to top 3 results
     return news_urls
 
-def summarize_news(urls):
+def summarize_news(news_urls):
+    """Generates summaries for a list of news URLs using OpenAI's GPT-4."""
+    prompts = [f"Summarize this article: {url}" for url in news_urls]
     summaries = []
-    for url in urls:
+    for prompt in prompts:
         response = openai.Completion.create(
-            engine="gpt-4",  # Using GPT-4
-            prompt=f"Summarize this news article URL {url} in a few sentences:",
+            engine="gpt-4",
+            prompt=prompt,
             temperature=0.5,
             max_tokens=150,
             top_p=1.0,
@@ -40,29 +46,27 @@ def summarize_news(urls):
         summaries.append(response.choices[0].text.strip())
     return summaries
 
-def generate_news_segment(news_urls):
-    summaries = summarize_news(news_urls)
-    news_segment = "Here are today's top tech stories: " + " ".join(summaries)
-    return news_segment
-
-def find_songs():
-    songs = ['Song 1 by Artist A', 'Song 2 by Artist B', 'Song 3 by Artist C']
+def find_songs(youtube_api_key, query):
+    """Finds songs related to a query using the YouTube Data API."""
+    url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q={query}&key={youtube_api_key}"
+    response = requests.get(url)
+    results = response.json().get('items', [])
+    songs = [f"{result['snippet']['title']} (YouTube Link: https://www.youtube.com/watch?v={result['id']['videoId']})" for result in results if result['id'].get('videoId')]
     return songs
-
-def generate_daily_mixtape(songs):
-    mixtape_segment = "And now, let's get your mood right with our daily mixtape: " + ", ".join(songs)
-    return mixtape_segment
 
 def main():
     intro = create_dynamic_intro()
-    news_urls = search_for_news()
-    news_segment = generate_news_segment(news_urls)
-    songs = find_songs()
-    mixtape_segment = generate_daily_mixtape(songs)
+    news_query = "latest technology news"
+    news_urls = search_for_news(GOOGLE_API_KEY, news_query)
+    news_summaries = summarize_news(news_urls)
+    news_segment = "Here are today's top tech stories: " + " ".join(news_summaries)
+    
+    songs_query = "top tech innovation songs"
+    songs = find_songs(YOUTUBE_API_KEY, songs_query)
+    mixtape_segment = "And now, let's get your mood right with our daily mixtape: " + " ".join(songs)
     
     full_script = f"{intro}\n\n{news_segment}\n\n{mixtape_segment}"
     print(full_script)
-    # Placeholder for further API integrations for voiceover and music clips
 
 if __name__ == "__main__":
     main()
