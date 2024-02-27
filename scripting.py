@@ -1,6 +1,7 @@
 import datetime
 import openai
 import requests
+import streamlit as st
 
 # Replace these with your actual API keys
 OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'
