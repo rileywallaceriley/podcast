@@ -2,3 +2,4 @@ pydub
 pytube
 streamlit
 ffmpeg
+libav-tools
